@@ -57,7 +57,7 @@ export default class Oscillator extends React.PureComponent {
       detune: 0,
       harmonics: Array.from({ length: 1 }).map((_, i) => 1 / (i + 2) ** 2),
       transpose: 0,
-      volume: 0.2,
+      volume: 0.6,
       waveform: 0,
     }
 

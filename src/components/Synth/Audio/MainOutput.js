@@ -24,7 +24,7 @@ export default class MainOutput extends React.PureComponent {
 
     this.state = {
       mute: true,
-      volume: 0.4,
+      volume: 0.8,
     }
 
     this.inputNode = this.props.audioCtx.createGain()

@@ -46,7 +46,6 @@ export default class Audio extends React.PureComponent {
     this.animations = {}
 
     this.audioCtx = new (window.AudioContext || window.webkitAudioContext)()
-    console.log(this.audioCtx)
   }
 
   componentDidMount() {
