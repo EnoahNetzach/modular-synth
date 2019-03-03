@@ -6,7 +6,6 @@ import LFO from './LFO'
 import MainOutput from './MainOutput'
 import Oscillator from './Oscillator'
 import PassFilter from './PassFilter'
-import Tuner from './Tuner'
 import WaveShaper from './WaveShaper'
 
 const baseHeight = 220
@@ -118,12 +117,6 @@ export default class Audio extends React.PureComponent {
             audioCtx={this.audioCtx}
             deregisterAnimations={() => this.deregisterAnimations('main_output')}
             registerAnimation={animation => this.registerAnimation('main_output', animation)}
-          />
-
-          <Tuner
-            audioCtx={this.audioCtx}
-            deregisterAnimations={() => this.deregisterAnimations('tuner')}
-            registerAnimation={animation => this.registerAnimation('tuner', animation)}
           />
 
           <Keyboard
