@@ -1,9 +1,11 @@
 import { css } from 'glamor'
 import React from 'react'
 import Connector from './Connector'
+import Envelope from './Envelope'
 import Keyboard from './Keyboard'
 import LFO from './LFO'
 import MainOutput from './MainOutput'
+import Mixer from './Mixer'
 import Oscillator from './Oscillator'
 import PassFilter from './PassFilter'
 import WaveShaper from './WaveShaper'
@@ -26,8 +28,14 @@ export default class Audio extends React.PureComponent {
     super(props)
 
     this.state = {
+      envelopes: Array.from({ length: 2 }).map((_, i) => ({
+        id: `envelope_${i}`,
+      })),
       lfos: Array.from({ length: 2 }).map((_, i) => ({
         id: `lfo_${i}`,
+      })),
+      mixers: Array.from({ length: 2 }).map((_, i) => ({
+        id: `mixer_${i}`,
       })),
       oscillators: Array.from({ length: 6 }).map((_, i) => ({
         frequency: 440,
@@ -35,7 +43,7 @@ export default class Audio extends React.PureComponent {
         started: 0,
         active: false,
       })),
-      passFilters: Array.from({ length: 2 }).map((_, i) => ({
+      passFilters: Array.from({ length: 1 }).map((_, i) => ({
         id: `pass_filter_${i}`,
       })),
       waveShapers: Array.from({ length: 1 }).map((_, i) => ({
@@ -87,6 +95,24 @@ export default class Audio extends React.PureComponent {
 
           {this.state.lfos.map(({ id }, i) => (
             <LFO
+              audioCtx={this.audioCtx}
+              deregisterAnimations={() => this.deregisterAnimations(id)}
+              key={id}
+              registerAnimation={animation => this.registerAnimation(id, animation)}
+            />
+          ))}
+
+          {this.state.envelopes.map(({ id }, i) => (
+            <Envelope
+              audioCtx={this.audioCtx}
+              deregisterAnimations={() => this.deregisterAnimations(id)}
+              key={id}
+              registerAnimation={animation => this.registerAnimation(id, animation)}
+            />
+          ))}
+
+          {this.state.mixers.map(({ id }, i) => (
+            <Mixer
               audioCtx={this.audioCtx}
               deregisterAnimations={() => this.deregisterAnimations(id)}
               key={id}
