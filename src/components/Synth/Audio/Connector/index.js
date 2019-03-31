@@ -41,21 +41,18 @@ export default class Connector extends React.PureComponent {
     this.onCableSelected = this.onCableSelected.bind(this)
     this.onConnect = this.onConnect.bind(this)
     this.onKeyDown = this.onKeyDown.bind(this)
-    this.onKeyUp = this.onKeyUp.bind(this)
     this.onMouseMove = this.onMouseMove.bind(this)
     this.onScroll = this.onScroll.bind(this)
   }
 
   componentDidMount() {
     window.addEventListener('keydown', this.onKeyDown)
-    window.addEventListener('keyup', this.onKeyUp)
     window.addEventListener('mousemove', this.onMouseMove)
     window.addEventListener('scroll', this.onScroll)
   }
 
   componentWillUnount() {
     window.removeEventListener('keydown', this.onKeyDown)
-    window.removeEventListener('keyup', this.onKeyUp)
     window.removeEventListener('mousemove', this.onMouseMove)
     window.removeEventListener('scroll', this.onScroll)
   }
@@ -142,7 +139,6 @@ export default class Connector extends React.PureComponent {
       event.key === 'c' &&
       !this.state.connectionPositions.find(connection => !connection.input || !connection.output)
     ) {
-      // TODO "not connecting"
       this.setState({ editing: true })
     }
 
@@ -166,20 +162,16 @@ export default class Connector extends React.PureComponent {
     if (event.key === 'Escape') {
       this.setState(
         ({ connectionPositions }) => ({
+          editing: false,
           connectionPositions: connectionPositions.map(connection => ({
             ...connection,
             toDelete: !connection.input || !connection.output,
           })),
           mousePosition: null,
+          selectedCable: null,
         }),
         this.deleteConnections,
       )
-    }
-  }
-
-  onKeyUp(event) {
-    if (event.key === 'c') {
-      this.setState({ editing: false })
     }
   }
 
