@@ -1,0 +1,164 @@
+@keyframes appear {
+  0% {
+    opacity: 0;
+    transform: scale3d(0.7, 0.7, 0.7);
+  }
+  50% {
+    opacity: 0;
+    transform: scale3d(0.7, 0.7, 0.7);
+  }
+  100% {
+    opacity: 1;
+    transform: scale3d(1, 1, 1);
+  }
+}
+
+@keyframes colors {
+  0% {
+    background: #481e67;
+    fill: #fff;
+  }
+  25% {
+    background: #7d4aa2;
+  }
+  50% {
+    background: #944aa2;
+    fill: #d8d6c5;
+  }
+  75% {
+    background: #8a1b9e;
+  }
+  100% {
+    background: #481e67;
+    fill: #fff;
+  }
+}
+
+@keyframes opacity {
+  0% {
+    opacity: 0;
+  }
+  91% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  30% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes shapes {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.container {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+  position: static;
+  width: 100vw;
+}
+
+.splash {
+  animation: colors 8s linear infinite;
+  height: 100vh;
+  width: 100vw;
+}
+
+.title {
+  animation: appear 4s linear;
+  font-size: 3em;
+  font-weight: bold;
+  transform-origin: center center;
+}
+
+.text {
+  animation: opacity 4.6s linear;
+  font-size: 1em;
+  transform-origin: center center;
+}
+
+.background {
+  fill: none;
+  stroke: white;
+  transform: translate(calc(50% - 350px), calc(40% - 260px));
+}
+
+.shape {
+  fill: #8a1b9e;
+  stroke: #2f2f2f;
+}
+
+.shape.a {
+  animation: shapes 2.2s ease-in-out, pulse 3.01s linear infinite;
+}
+
+.shape.b {
+  animation: shapes 1.9s ease-in-out, pulse 3.2s linear infinite;
+}
+
+.shape.c {
+  animation: shapes 1.95s ease-in-out, pulse 3s linear infinite;
+}
+
+.shape.d {
+  animation: shapes 1.67s ease-in-out, pulse 3.3s linear infinite;
+}
+
+.shape.e {
+  animation: shapes 2s ease-in-out, pulse 3.1s linear infinite;
+}
+
+.shape.f {
+  animation: shapes 2.13s ease-in-out, pulse 2.95s linear infinite;
+}
+
+.shape.g {
+  animation: shapes 2.26s ease-in-out, pulse 3.21s linear infinite;
+}
+
+.shape.h {
+  animation: shapes 2.22s ease-in-out, pulse 2.9s linear infinite;
+}
+
+.shape.i {
+  animation: shapes 2.01s ease-in-out, pulse 3.05s linear infinite;
+}
+
+.shape.j {
+  animation: shapes 2.3s ease-in-out, pulse 2.98s linear infinite;
+}
+
+.shape.k {
+  animation: shapes 2.04s ease-in-out, pulse 2.7s linear infinite;
+}
+
+.shape.l {
+  animation: shapes 1.87s ease-in-out, pulse 3.24s linear infinite;
+}
+
+.shape.m {
+  animation: shapes 1.96s ease-in-out, pulse 2.95s linear infinite;
+}
+
+.shape.n {
+  animation: shapes 2.37s ease-in-out, pulse 3.13s linear infinite;
+}

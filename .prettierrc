@@ -1,0 +1,23 @@
+{
+  "importOrder": [".polyfill$", "^./env$", "<THIRD_PARTY_MODULES>", "^@(.*)$", "^~(.*)$", ".css$", "^[./]"],
+  "overrides": [
+    {
+      "files": ".snyk",
+      "options": {
+        "parser": "yaml"
+      }
+    },
+    {
+      "files": [".eslintrc", ".lintstagedrc", ".prettierrc", ".versionrc"],
+      "options": {
+        "parser": "json"
+      }
+    }
+  ],
+  "plugins": ["@trivago/prettier-plugin-sort-imports", "prettier-plugin-sh"],
+  "printWidth": 120,
+  "semi": false,
+  "singleQuote": true,
+  "tabWidth": 2,
+  "trailingComma": "all"
+}

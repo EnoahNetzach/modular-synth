@@ -1,0 +1,11 @@
+.scopes {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  width: 100%;
+}
+
+.mute {
+  margin-top: 10px;
+}

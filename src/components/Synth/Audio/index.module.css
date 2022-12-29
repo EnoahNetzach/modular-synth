@@ -1,0 +1,63 @@
+.grid {
+  --ratio: calc(17 / 22);
+  --base-width: 170px;
+  --base-height: calc(var(--base-width) / var(--ratio));
+  --cols: 6;
+  --rows: 9;
+
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(var(--rows), 1fr);
+  height: calc(var(--base-height) * var(--rows));
+  position: relative;
+  width: calc(var(--base-width) * var(--cols));
+}
+
+.rack {
+  --color: #696b6f;
+  --background: #2b2d30;
+  --thickness: 20px;
+
+  background: repeating-linear-gradient(
+      to right,
+      var(--color),
+      var(--color) var(--thickness),
+      transparent var(--thickness),
+      transparent calc(var(--base-width) - var(--thickness)),
+      var(--color) calc(var(--base-width) - var(--thickness)),
+      var(--color) var(--base-width)
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      var(--color),
+      var(--color) var(--thickness),
+      var(--background) var(--thickness),
+      var(--background) calc(var(--base-height) - var(--thickness)),
+      var(--color) calc(var(--base-height) - var(--thickness)),
+      var(--color) var(--base-height)
+    );
+  height: 100%;
+  position: absolute;
+  width: 100%;
+  z-index: -2;
+}
+
+.rack::before {
+  --w-density: 8;
+  --h-density: 12;
+  --size: 4px;
+
+  background-image: radial-gradient(
+    var(--size) var(--size),
+    var(--background),
+    var(--background) var(--size),
+    transparent var(--size)
+  );
+  background-position: calc(50% - var(--size) * 2.6) calc(50% - var(--size) * 2.5);
+  background-size: calc(var(--base-width) / var(--w-density)) calc(var(--base-height) / var(--h-density));
+  content: '';
+  height: 100%;
+  position: absolute;
+  width: 100%;
+  z-index: -1;
+}

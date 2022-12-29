@@ -1,0 +1,58 @@
+.container {
+  align-items: center;
+  color: #1d1a1a;
+  display: flex;
+  flex-direction: column;
+  font-weight: 800;
+  justify-content: center;
+  margin: 5px;
+}
+
+.washer {
+  --washer-size: 22;
+
+  background: #aaa;
+  display: block;
+  height: calc(1px * var(--washer-size));
+  min-height: calc(1px * var(--washer-size));
+  min-width: calc(1px * var(--washer-size));
+  position: relative;
+  width: calc(1px * var(--washer-size));
+}
+
+.round {
+  border-radius: 50%;
+}
+
+.plug {
+  border-radius: 50%;
+  border: 2px solid #444;
+  display: block;
+  height: 14px;
+  margin: 4px;
+  min-height: 14px;
+  min-width: 14px;
+  position: relative;
+  width: 14px;
+}
+
+.plug::before {
+  background: #aaa;
+  border-radius: 50%;
+  border: 2px solid #aaa;
+  content: '';
+  display: block;
+  height: 10px;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 10px;
+}
+
+.plugged::before {
+  background: #2f2f2f;
+}
+
+.label {
+  margin-top: 3px;
+}

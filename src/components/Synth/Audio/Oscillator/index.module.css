@@ -1,0 +1,50 @@
+.scope {
+  margin-bottom: 5px;
+}
+
+.indicators {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  margin: 20px 0;
+}
+
+.light {
+  --size: 14px;
+  --border: 2px;
+
+  border-radius: 50%;
+  border: var(--border) solid #444;
+  display: block;
+  height: var(--size);
+  margin: var(--border);
+  position: relative;
+  width: var(--size);
+}
+
+.light::before {
+  background: #aaa;
+  border-radius: 50%;
+  border: var(--border) solid #aaa;
+  content: '';
+  display: block;
+  height: calc(var(--size) - 2 * var(--border));
+  inset: 0;
+  position: absolute;
+  width: calc(var(--size) - 2 * var(--border));
+}
+
+.light.on {
+  border-color: #444;
+}
+
+.light.on::before {
+  background: #ea1919;
+  border-color: #981a1a;
+}
+
+.plugs {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+}

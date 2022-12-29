@@ -1,0 +1,13 @@
+.scope {
+  margin-bottom: 5px;
+}
+
+.name {
+  margin: 20px 0;
+}
+
+.plugs {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+}

@@ -1,0 +1,22 @@
+.controls {
+  align-self: stretch;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.keyboard {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.keyboard .key {
+  color: black;
+  font-size: 0.75em;
+  font-weight: bold;
+  outline: none;
+}

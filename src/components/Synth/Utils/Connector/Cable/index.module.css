@@ -1,0 +1,29 @@
+.container {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.cable {
+  fill: none;
+  pointer-events: none;
+  stroke: rgb(93 206 8);
+  stroke-width: 7px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.cable[data-status='highlighted'] {
+  pointer-events: visibleStroke;
+  stroke: rgb(206 93 8);
+}
+
+.cable[data-status='selected'] {
+  --outline-filter-id-url: url('#');
+
+  filter: var(--outline-filter-id-url);
+  stroke: rgb(8 93 206);
+}

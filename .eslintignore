@@ -1,0 +1,8 @@
+/.husky/_/
+/.pnp.*
+/.yarn
+
+build/
+wasm-audio/
+
+TextEncoder.polyfill.js
