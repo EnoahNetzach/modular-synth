@@ -1,9 +1,22 @@
 .controls {
+  align-items: center;
   align-self: stretch;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   margin-bottom: 20px;
+}
+
+.midi {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 5px;
+}
+
+.midi .label {
+  font-weight: 800;
 }
 
 .keyboard {

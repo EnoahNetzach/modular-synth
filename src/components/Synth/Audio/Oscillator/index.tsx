@@ -1,19 +1,20 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import css from './index.module.css'
 import GateNode from '../../../../utils/GateNode'
-import getFrequencyFromSemitone from '../../../../utils/getFrequencyFromSemitone'
 import JackPlug from '../../Utils/JackPlug'
 import Oscilloscope from '../../Utils/Oscilloscope'
 import Panel from '../../Utils/Panel'
 import Preset from '../../Utils/Preset'
 import Slider from '../../Utils/Slider'
-import WhiteNoiseNode from './WhiteNoiseNode'
+import WhiteNoiseNode from '../../Utils/WhiteNoiseNode'
+import { waveforms } from './constants'
+import type { Sound } from './types'
+import useControls from './useControls'
+import useMIDIPitchBend from './useMIDIPitchBend'
+import useSound from './useSound'
 
-const waveforms: (OscillatorType | 'noise')[] = ['sine', 'triangle', 'square', 'sawtooth', 'noise']
-
-interface Sound {
-  gain: GainNode
-  oscillator: OscillatorNode
+function calcHarmonics(count: number) {
+  return Array.from({ length: count }).map((_, i) => 1 / (i + 2) ** 2)
 }
 
 interface Props {
@@ -26,10 +27,12 @@ interface Props {
 
 export default function Oscillator({ audioCtx, deregisterAnimations, frequency, id, registerAnimation }: Props) {
   const [detune, setDetune] = useState(0)
-  const [harmonics] = useState(Array.from({ length: 1 }).map((_, i) => 1 / (i + 2) ** 2))
+  const [harmonics, setHarmonicsRaw] = useState(() => calcHarmonics(1))
   const [transpose, setTranspose] = useState(0)
   const [volume, setVolume] = useState(60)
   const [waveform, setWaveform] = useState(0)
+
+  const setHarmonics = useCallback((count: number) => setHarmonicsRaw(calcHarmonics(count)), [])
 
   const sounds = useRef<Sound[]>([])
 
@@ -49,86 +52,31 @@ export default function Oscillator({ audioCtx, deregisterAnimations, frequency, 
     [audioCtx, gatedNode],
   )
 
-  const startSound = useCallback(() => {
-    sounds.current = harmonics.map((harmonicGain, i) => {
-      const oscillator = new OscillatorNode(audioCtx)
+  useSound({
+    audioCtx,
+    gatedNode,
+    harmonics,
+    harmonicsMixerNode,
+    mixerNode,
+    outputNode,
+    sounds,
+  })
 
-      oscillator.start()
+  useControls({
+    audioCtx,
+    detune,
+    frequency,
+    harmonics,
+    harmonicsMixerNode,
+    mixerNode,
+    sounds,
+    transpose,
+    volume,
+    waveform,
+    whiteNoiseNode,
+  })
 
-      const gain = new GainNode(audioCtx, { gain: harmonicGain })
-
-      oscillator.connect(gain)
-      gain.connect(harmonicsMixerNode)
-
-      return { oscillator, gain }
-    })
-
-    harmonicsMixerNode.connect(mixerNode)
-  }, [audioCtx, harmonics, harmonicsMixerNode, mixerNode])
-
-  const stopSound = useCallback(() => {
-    sounds.current.forEach(({ oscillator, gain }) => {
-      oscillator.disconnect(gain)
-      gain.disconnect(harmonicsMixerNode)
-    })
-
-    sounds.current = []
-
-    try {
-      harmonicsMixerNode.disconnect(mixerNode)
-    } catch {}
-    try {
-      whiteNoiseNode.disconnect(mixerNode)
-    } catch {}
-  }, [harmonicsMixerNode, mixerNode, whiteNoiseNode])
-
-  useEffect(() => {
-    startSound()
-    mixerNode.connect(gatedNode)
-    gatedNode.connect(outputNode)
-
-    return () => {
-      gatedNode.disconnect(outputNode)
-      mixerNode.disconnect(gatedNode)
-      stopSound()
-    }
-  }, [gatedNode, mixerNode, outputNode, startSound, stopSound])
-
-  useEffect(() => {
-    const type = waveforms[waveform]
-    if (type === 'noise') {
-      harmonicsMixerNode.disconnect(mixerNode)
-      whiteNoiseNode.connect(mixerNode)
-
-      return () => {
-        whiteNoiseNode.disconnect(mixerNode)
-        harmonicsMixerNode.connect(mixerNode)
-      }
-    }
-
-    sounds.current.forEach(({ oscillator }) => {
-      oscillator.type = type
-    })
-  }, [harmonicsMixerNode, mixerNode, waveform, whiteNoiseNode])
-
-  useEffect(() => {
-    sounds.current.forEach(({ oscillator }) => {
-      oscillator.detune.setValueAtTime(detune, audioCtx.currentTime)
-    })
-  }, [audioCtx, detune])
-
-  useEffect(() => {
-    mixerNode.gain.setValueAtTime(volume / 100, audioCtx.currentTime)
-  }, [audioCtx, mixerNode, volume])
-
-  useEffect(() => {
-    sounds.current.forEach(({ oscillator }, i) =>
-      oscillator.frequency.setValueAtTime(
-        getFrequencyFromSemitone(frequency, transpose) * (i + 1),
-        audioCtx.currentTime,
-      ),
-    )
-  }, [audioCtx, frequency, transpose])
+  useMIDIPitchBend({ audioCtx, detune, range: 200, sounds })
 
   return (
     <Preset id={id}>
@@ -138,7 +86,7 @@ export default function Oscillator({ audioCtx, deregisterAnimations, frequency, 
             audioCtx={audioCtx}
             deregisterAnimations={deregisterAnimations}
             height={130}
-            input={mixerNode}
+            input={gatedNode}
             registerAnimation={registerAnimation}
             width={130}
           />
@@ -160,6 +108,8 @@ export default function Oscillator({ audioCtx, deregisterAnimations, frequency, 
           transformer={(value) => waveforms[value]}
           value={waveform}
         />
+
+        <Slider label="Harmonics" max={16} min={1} onChange={setHarmonics} step={1} value={harmonics.length} />
 
         <Slider
           defaultValue={0}

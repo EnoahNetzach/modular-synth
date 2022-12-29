@@ -1,0 +1,51 @@
+name: Modular Synth
+
+on:
+  push:
+    branches: ['master']
+  pull_request:
+    branches: ['master']
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 'master'
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  FORCE_COLOR: 1
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: jetli/wasm-pack-action@v0.4.0
+      - uses: volta-cli/action@v4.0.0
+
+      - name: Wasm
+        run: >
+          cd ./wasm-audio &&
+          wasm-pack build --target web
+
+      - name: Add wasm
+        run: yarn add 'wasm-audio@./wasm-audio/pkg' --mode=update-lockfile
+
+      - name: Install
+        run: yarn install --immutable
+
+      - name: Build
+        run: yarn build
+#      - name: Git setup
+#        run: >
+#          git remote remove origin &&
+#          git remote add origin https://${{ secrets.GITHUB_TOKEN }}@github.com/EnoahNetzach/modular-synth.git &&
+#          git config --global user.name "GitHub actions"
+#
+#      - name: Deploy
+#        run: yarn deploy

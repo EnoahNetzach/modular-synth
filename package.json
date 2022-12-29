@@ -2,6 +2,8 @@
   "name": "modular-synth",
   "version": "0.1.0",
   "private": true,
+  "license": "UNLICENSED",
+  "homepage": "https://enoahnetzach.github.io/modular-synth",
   "packageManager": "yarn@3.2.0",
   "volta": {
     "node": "18.12.1",
@@ -9,9 +11,9 @@
   },
   "scripts": {
     "start": "craco start",
-    "prebuild": "yarn wasm:build",
     "build": "craco build",
     "test": "craco test",
+    "deploy": "gh-pages -d build",
     "wasm:build": "cd ./wasm-audio && wasm-pack build --target bundler",
     "format": "yarn format:file '**/*'",
     "format:file": "prettier --write --ignore-unknown",
@@ -41,6 +43,7 @@
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
     "@types/uuid": "^9",
+    "gh-pages": "^4.0.0",
     "prettier": "^2.8.1",
     "prettier-plugin-sh": "^0.12.8",
     "typescript": "^4.4.2",
