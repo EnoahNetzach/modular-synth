@@ -3,13 +3,11 @@ name: Modular Synth
 on:
   push:
     branches: ['master']
-  pull_request:
-    branches: ['master']
 
 permissions:
   contents: read
-  pages: write
   id-token: write
+  pages: write
 
 concurrency:
   group: 'master'
@@ -20,7 +18,7 @@ env:
   FORCE_COLOR: 1
 
 jobs:
-  pipeline:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -33,7 +31,7 @@ jobs:
           cd ./wasm-audio &&
           wasm-pack build --target web
 
-      - name: Add wasm
+      - name: Add built wasm lib
         run: yarn add 'wasm-audio@./wasm-audio/pkg' --mode=update-lockfile
 
       - name: Install
@@ -41,11 +39,22 @@ jobs:
 
       - name: Build
         run: yarn build
-#      - name: Git setup
-#        run: >
-#          git remote remove origin &&
-#          git remote add origin https://${{ secrets.GITHUB_TOKEN }}@github.com/EnoahNetzach/modular-synth.git &&
-#          git config --global user.name "GitHub actions"
-#
-#      - name: Deploy
-#        run: yarn deploy
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: ./build
+
+  deploy:
+    runs-on: ubuntu-latest
+
+    needs: build
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v1
