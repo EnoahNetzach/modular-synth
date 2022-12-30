@@ -3116,6 +3116,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/webmidi@npm:^2.0.6":
+  version: 2.0.6
+  resolution: "@types/webmidi@npm:2.0.6"
+  checksum: a6dfb35dc848888bb552a2d66be4f98915c3580d3d3c8f9eaf8af6eae7ac007857be1a6f10b9bf7f4f371c1a21771c7b03be9f8680005027d13b6cb73da27f7f
+  languageName: node
+  linkType: hard
+
 "@types/ws@npm:^8.5.1":
   version: 8.5.3
   resolution: "@types/ws@npm:8.5.3"
@@ -9169,6 +9176,7 @@ __metadata:
     "@types/react": ^18.0.0
     "@types/react-dom": ^18.0.0
     "@types/uuid": ^9
+    "@types/webmidi": ^2.0.6
     gh-pages: ^4.0.0
     prettier: ^2.8.1
     prettier-plugin-sh: ^0.12.8

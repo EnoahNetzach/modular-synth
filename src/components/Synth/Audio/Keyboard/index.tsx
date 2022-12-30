@@ -25,6 +25,7 @@ export default function Keyboard({ audioCtx, id, oscillators, setOscillators }: 
   const [type, setTypeRaw] = useState(0)
 
   const pressedSemitones = useRef<{ [key: string]: number }>({})
+
   const gateNode = useMemo(() => new GateNode(audioCtx), [audioCtx])
 
   const { startFrequency, stopFrequency } = useFrequency({ setOscillators, type })

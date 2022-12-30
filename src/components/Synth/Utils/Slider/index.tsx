@@ -82,7 +82,7 @@ export default function Slider<T extends string | number>({
   return (
     <div className={css.container}>
       {control ? (
-        <Preset id="control">
+        <Preset id={label}>
           <div className={css.plug}>
             <JackPlug output={control} label="In" />
           </div>

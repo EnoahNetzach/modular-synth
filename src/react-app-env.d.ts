@@ -1,4 +1,5 @@
 /// <reference types="react-scripts" />
+/// <reference types="@types/webmidi" />
 
 declare module 'worklet-loader!~/audioWorklets/PitchProcessor' {
   const url: string

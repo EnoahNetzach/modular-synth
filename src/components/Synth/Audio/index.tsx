@@ -3,7 +3,6 @@ import css from './index.module.css'
 import Connector from '../Utils/Connector'
 import MIDI from '../Utils/MIDI'
 import Preset from '../Utils/Preset'
-import WhiteNoiseNode from '../Utils/WhiteNoiseNode'
 import Envelope from './Envelope'
 import Keyboard from './Keyboard'
 import { Oscillator as OscillatorDesc } from './Keyboard/types'
@@ -82,117 +81,123 @@ export default function Audio() {
     }
   }, [draw])
 
-  return !workletsLoaded ? null : (
+  return (
     <div className={css.grid}>
       <div className={css.rack} />
 
       <MIDI>
-        <Preset
-          defaultConnections={[
-            ['keyboard.IO.GOut', 'envelopes[0].IO.GIn'],
-            ['envelopes[0].IO.GOut', 'oscillators[0].IO.GIn'],
-            ['keyboard.IO.GOut', 'oscillators[1].IO.GIn'],
-            ['keyboard.IO.GOut', 'oscillators[2].IO.GIn'],
-            ['keyboard.IO.GOut', 'oscillators[3].IO.GIn'],
-            ['oscillators[0].IO.Out', 'mixers[0].IO.In'],
-            ['oscillators[1].IO.Out', 'mixers[0].IO.In'],
-            ['oscillators[2].IO.Out', 'mixers[0].IO.In'],
-            ['oscillators[3].IO.Out', 'passFilters[0].IO.In'],
-            ['passFilters[0].IO.Out', 'mixers[0].IO.In'],
-            ['mixers[0].IO.Out', 'mainOutput.IO.In'],
-          ]}
-          defaultParams={[
-            ['keyboard.Type', [1]],
-            ['oscillators[0].Waveform', [3]],
-            ['oscillators[1].Waveform', [1]],
-            ['oscillators[1].Harmonics', [16]],
-            ['oscillators[1].Transpose', [-12]],
-            ['oscillators[1].Volume', [40]],
-            ['oscillators[2].Transpose', [12]],
-            ['oscillators[2].Volume', [15]],
-            ['oscillators[3].Waveform', [4]],
-            ['oscillators[3].Volume', [10]],
-            ['envelopes[0].Attack', [100]],
-            ['envelopes[0].Decay', [150]],
-            ['envelopes[0].Sustain', [0]],
-            ['envelopes[0].Release', [0]],
-            ['passFilters[0].Frequency', [765]],
-            ['passFilters[0].Balance', [100]],
-          ]}
-          id=""
-        >
-          <Connector>
-            {oscillators.map(({ frequency, id }) => (
-              <Oscillator
+        {!workletsLoaded ? null : (
+          <Preset
+            defaultConnections={[
+              ['keyboard.IO.GOut', 'envelopes[0].IO.GIn'],
+              ['envelopes[0].IO.GOut', 'oscillators[0].IO.GIn'],
+              ['keyboard.IO.GOut', 'oscillators[1].IO.GIn'],
+              ['keyboard.IO.GOut', 'oscillators[2].IO.GIn'],
+              ['keyboard.IO.GOut', 'oscillators[3].IO.GIn'],
+              ['oscillators[0].IO.Out', 'mixers[0].IO.In'],
+              ['oscillators[1].IO.Out', 'mixers[0].IO.In'],
+              ['oscillators[2].IO.Out', 'mixers[0].IO.In'],
+              ['oscillators[3].IO.Out', 'passFilters[0].IO.In'],
+              ['lfos[0].IO.Out', 'passFilters[0].Frequency.In'],
+              ['passFilters[0].IO.Out', 'mixers[0].IO.In'],
+              ['mixers[0].IO.Out', 'mainOutput.IO.In'],
+            ]}
+            defaultParams={[
+              ['keyboard.Type', [1]],
+              ['oscillators[0].Waveform', [3]],
+              ['oscillators[1].Waveform', [1]],
+              ['oscillators[1].Harmonics', [16]],
+              ['oscillators[1].Transpose', [-12]],
+              ['oscillators[1].Volume', [40]],
+              ['oscillators[2].Transpose', [12]],
+              ['oscillators[2].Volume', [15]],
+              ['oscillators[3].Waveform', [4]],
+              ['oscillators[3].Volume', [10]],
+              ['envelopes[0].Attack', [100]],
+              ['envelopes[0].Decay', [150]],
+              ['envelopes[0].Sustain', [0]],
+              ['envelopes[0].Release', [0]],
+              ['lfos[0].Waveform', [2]],
+              ['lfos[0].Frequency', [2000]],
+              ['lfos[0].Range', [60]],
+              ['passFilters[0].Frequency', [350]],
+              ['passFilters[0].Balance', [100]],
+            ]}
+            id=""
+          >
+            <Connector>
+              {oscillators.map(({ frequency, id }) => (
+                <Oscillator
+                  audioCtx={audioCtx}
+                  deregisterAnimations={() => deregisterAnimations(id)}
+                  frequency={frequency}
+                  id={id}
+                  key={id}
+                  registerAnimation={(animation) => registerAnimation(id, animation)}
+                />
+              ))}
+
+              {lfos.map(({ id }) => (
+                <LFO
+                  audioCtx={audioCtx}
+                  deregisterAnimations={() => deregisterAnimations(id)}
+                  id={id}
+                  key={id}
+                  registerAnimation={(animation) => registerAnimation(id, animation)}
+                />
+              ))}
+
+              {envelopes.map(({ id }) => (
+                <Envelope
+                  audioCtx={audioCtx}
+                  deregisterAnimations={() => deregisterAnimations(id)}
+                  id={id}
+                  key={id}
+                  registerAnimation={(animation) => registerAnimation(id, animation)}
+                />
+              ))}
+
+              {passFilters.map(({ id }) => (
+                <PassFilter
+                  audioCtx={audioCtx}
+                  deregisterAnimations={() => deregisterAnimations(id)}
+                  id={id}
+                  key={id}
+                  registerAnimation={(animation) => registerAnimation(id, animation)}
+                />
+              ))}
+
+              {mixers.map(({ id }) => (
+                <Mixer
+                  audioCtx={audioCtx}
+                  deregisterAnimations={() => deregisterAnimations(id)}
+                  id={id}
+                  key={id}
+                  registerAnimation={(animation) => registerAnimation(id, animation)}
+                />
+              ))}
+
+              {/*{this.state.waveShapers.map(({ id }) => (*/}
+              {/*  <WaveShaper*/}
+              {/*    audioCtx={this.audioCtx}*/}
+              {/*    deregisterAnimations={() => this.deregisterAnimations(id)}*/}
+              {/*    id={id}*/}
+              {/*    key={id}*/}
+              {/*    registerAnimation={(animation) => this.registerAnimation(id, animation)}*/}
+              {/*  />*/}
+              {/*))}*/}
+
+              <MainOutput
                 audioCtx={audioCtx}
-                deregisterAnimations={() => deregisterAnimations(id)}
-                frequency={frequency}
-                id={id}
-                key={id}
-                registerAnimation={(animation) => registerAnimation(id, animation)}
+                deregisterAnimations={() => deregisterAnimations('mainOutput')}
+                id="mainOutput"
+                registerAnimation={(animation) => registerAnimation('mainOutput', animation)}
               />
-            ))}
 
-            {lfos.map(({ id }) => (
-              <LFO
-                audioCtx={audioCtx}
-                deregisterAnimations={() => deregisterAnimations(id)}
-                id={id}
-                key={id}
-                registerAnimation={(animation) => registerAnimation(id, animation)}
-              />
-            ))}
-
-            {envelopes.map(({ id }) => (
-              <Envelope
-                audioCtx={audioCtx}
-                deregisterAnimations={() => deregisterAnimations(id)}
-                id={id}
-                key={id}
-                registerAnimation={(animation) => registerAnimation(id, animation)}
-              />
-            ))}
-
-            {passFilters.map(({ id }) => (
-              <PassFilter
-                audioCtx={audioCtx}
-                deregisterAnimations={() => deregisterAnimations(id)}
-                id={id}
-                key={id}
-                registerAnimation={(animation) => registerAnimation(id, animation)}
-              />
-            ))}
-
-            {mixers.map(({ id }) => (
-              <Mixer
-                audioCtx={audioCtx}
-                deregisterAnimations={() => deregisterAnimations(id)}
-                id={id}
-                key={id}
-                registerAnimation={(animation) => registerAnimation(id, animation)}
-              />
-            ))}
-
-            {/*{this.state.waveShapers.map(({ id }) => (*/}
-            {/*  <WaveShaper*/}
-            {/*    audioCtx={this.audioCtx}*/}
-            {/*    deregisterAnimations={() => this.deregisterAnimations(id)}*/}
-            {/*    id={id}*/}
-            {/*    key={id}*/}
-            {/*    registerAnimation={(animation) => this.registerAnimation(id, animation)}*/}
-            {/*  />*/}
-            {/*))}*/}
-
-            <MainOutput
-              audioCtx={audioCtx}
-              deregisterAnimations={() => deregisterAnimations('mainOutput')}
-              id="mainOutput"
-              registerAnimation={(animation) => registerAnimation('mainOutput', animation)}
-            />
-
-            <Keyboard audioCtx={audioCtx} id="keyboard" oscillators={oscillators} setOscillators={setOscillators} />
-          </Connector>
-        </Preset>
+              <Keyboard audioCtx={audioCtx} id="keyboard" oscillators={oscillators} setOscillators={setOscillators} />
+            </Connector>
+          </Preset>
+        )}
       </MIDI>
     </div>
   )
