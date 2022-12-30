@@ -68,7 +68,7 @@ export default function Spectroscope({
   useEffect(() => {
     input.connect(analyser)
 
-    const canvasCtx = canvasRef.current?.getContext('2d')
+    const canvasCtx = canvasRef.current?.getContext('2d', { willReadFrequently: true })
     if (canvasCtx) {
       canvasCtx.fillStyle = 'rgb(0, 0, 0)'
       canvasCtx.fillRect(0, 0, width, height)

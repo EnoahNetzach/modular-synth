@@ -27,6 +27,14 @@ export default function useFrequency({ setOscillators, type }: Params) {
               },
               ...oscillators.slice(1),
             ]
+          case 'chord': {
+            return oscillators.map((oscillator) => ({
+              ...oscillator,
+              active: true,
+              frequency,
+              started: new Date().getTime(),
+            }))
+          }
           case 'poly': {
             let freeOscillatorIndex = oscillators.findIndex((oscillator) => !oscillator.active)
             if (freeOscillatorIndex === -1) {
@@ -52,14 +60,6 @@ export default function useFrequency({ setOscillators, type }: Params) {
               ...oscillators.slice(freeOscillatorIndex + 1),
             ]
           }
-          case 'chord': {
-            return oscillators.map((oscillator) => ({
-              ...oscillator,
-              active: true,
-              frequency,
-              started: new Date().getTime(),
-            }))
-          }
         }
       }),
     [setOscillators, type],
@@ -83,6 +83,12 @@ export default function useFrequency({ setOscillators, type }: Params) {
               },
               ...oscillators.slice(1),
             ]
+          case 'chord': {
+            return oscillators.map((oscillator) => ({
+              ...oscillator,
+              active: false,
+            }))
+          }
           case 'poly':
             return [
               ...oscillators.slice(0, oscillatorIndex),
@@ -94,13 +100,6 @@ export default function useFrequency({ setOscillators, type }: Params) {
               },
               ...oscillators.slice(oscillatorIndex + 1),
             ]
-
-          case 'chord': {
-            return oscillators.map((oscillator) => ({
-              ...oscillator,
-              active: false,
-            }))
-          }
         }
       }),
     [setOscillators, type],

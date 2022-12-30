@@ -45,17 +45,22 @@ export default function Slider<T extends string | number>({
 
   useEffect(() => {
     if (editing) {
+      setEditingValue(value)
       editorRef.current?.focus()
     }
-  }, [editing, editingValue, max, min, onChange])
+  }, [editing, value])
 
   const onEdited = useCallback(
     (event: { key: string }) => {
       if (event.key === 'Enter') {
         setEditing(false)
 
-        if (typeof editingValue === 'number') {
-          let tempValue = editingValue as number
+        if (typeof value === 'number') {
+          let tempValue: number = Number.parseFloat(editingValue.toString())
+
+          if (Number.isNaN(tempValue) || !Number.isFinite(tempValue)) {
+            tempValue = value
+          }
 
           if (min !== undefined) {
             tempValue = Math.max(min, tempValue)
@@ -68,7 +73,7 @@ export default function Slider<T extends string | number>({
         }
       }
     },
-    [editingValue, max, min, onChange],
+    [editingValue, max, min, onChange, value],
   )
 
   useEffect(() => {
