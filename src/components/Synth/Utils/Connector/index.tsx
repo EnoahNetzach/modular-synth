@@ -211,7 +211,7 @@ export default function Connector({ children }: PropsWithChildren<Props>) {
     if ('output' in toDelete) {
       toDelete.output.onDisconnect()
     }
-    if ('input' in toDelete && 'output' in toDelete && toDelete.input.node instanceof AudioNode) {
+    if ('input' in toDelete && 'output' in toDelete && 'disconnect' in toDelete.input.node) {
       toDelete.input.node.disconnect(toDelete.output.node as AudioNode)
     }
 
