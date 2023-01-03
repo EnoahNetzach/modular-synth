@@ -1,5 +1,7 @@
-import { createContext, CSSProperties, PropsWithChildren, useCallback, useEffect, useState } from 'react'
+import { createContext, CSSProperties, PropsWithChildren, useCallback, useEffect, useMemo, useState } from 'react'
+import * as uuid from 'uuid'
 import css from './index.module.css'
+import GateNode from '../../../../utils/GateNode'
 import Cable, { Status } from './Cable'
 
 export interface Position {
@@ -58,6 +60,8 @@ export default function Connector({ children }: PropsWithChildren<Props>) {
   const [scrollPosition, setScrollPosition] = useState({ x: window.scrollX, y: window.scrollY })
   const [selectedCable, setSelectedCable] = useState<number>()
   const [cableToDelete, setCableToDelete] = useState<number>()
+
+  const outlineFilterId = useMemo(() => uuid.v4(), [])
 
   const connect = useCallback(
     (
@@ -234,27 +238,86 @@ export default function Connector({ children }: PropsWithChildren<Props>) {
           } as CSSProperties
         }
       >
-        {connections.positions.map(({ input: { pos: p1 }, output: { pos: p2 } }, i) => (
-          <Cable
-            key={`${p1.x}_${p2.x}_${p1.y}_${p2.y}`}
-            onSelect={() => setSelectedCable(i)}
-            status={getCableStatus({ editing, selected: i === selectedCable })}
-            x1={p1.x}
-            x2={p2.x}
-            y1={p1.y}
-            y2={p2.y}
-          />
-        ))}
+        <svg className={css.container}>
+          <filter
+            id={outlineFilterId}
+            x="-20%"
+            y="-20%"
+            width="140%"
+            height="140%"
+            filterUnits="userSpaceOnUse"
+            primitiveUnits="userSpaceOnUse"
+            colorInterpolationFilters="linearRGB"
+          >
+            <feGaussianBlur
+              stdDeviation="5 5"
+              x="0%"
+              y="0%"
+              width="100%"
+              height="100%"
+              in="colormatrix"
+              edgeMode="duplicate"
+              result="blur"
+            />
+            <feColorMatrix
+              type="hueRotate"
+              values="20"
+              x="0%"
+              y="0%"
+              width="100%"
+              height="100%"
+              in="blur"
+              result="colormatrix"
+            />
+            <feMerge x="0%" y="0%" width="100%" height="100%" result="merge1">
+              <feMergeNode in="merge1" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
 
-        {connections.dangling && mousePosition && scrollPosition ? (
-          <Cable
-            status="selected"
-            x1={('input' in connections.dangling ? connections.dangling.input.pos : connections.dangling.output.pos).x}
-            x2={mousePosition.x + scrollPosition.x}
-            y1={('input' in connections.dangling ? connections.dangling.input.pos : connections.dangling.output.pos).y}
-            y2={mousePosition.y + scrollPosition.y}
-          />
-        ) : null}
+          <g>
+            {connections.positions.map(({ input: { pos: p1, ...input }, output: { pos: p2, ...output } }, i) => (
+              <Cable
+                key={`${p1.x}_${p2.x}_${p1.y}_${p2.y}`}
+                id={`${p1.x}_${p2.x}_${p1.y}_${p2.y}`}
+                isGate={input.node instanceof GateNode || output.node instanceof GateNode}
+                onSelect={() => setSelectedCable(i)}
+                outlineFilterId={outlineFilterId}
+                status={getCableStatus({ editing, selected: i === selectedCable })}
+                x1={p1.x}
+                x2={p2.x}
+                y1={p1.y}
+                y2={p2.y}
+              />
+            ))}
+
+            {connections.dangling && mousePosition && scrollPosition ? (
+              <Cable
+                status="selected"
+                id="dangling"
+                outlineFilterId={outlineFilterId}
+                x1={
+                  ('input' in connections.dangling ? connections.dangling.input.pos : connections.dangling.output.pos).x
+                }
+                x2={mousePosition.x + scrollPosition.x}
+                y1={
+                  ('input' in connections.dangling ? connections.dangling.input.pos : connections.dangling.output.pos).y
+                }
+                y2={mousePosition.y + scrollPosition.y}
+              />
+            ) : null}
+          </g>
+
+          {!editing ? (
+            <g>
+              {connections.positions.map(({ input: { pos: p1 }, output: { pos: p2 } }, i) => (
+                <use key={`${p1.x}_${p2.x}_${p1.y}_${p2.y}`} xlinkHref={`#${p1.x}_${p2.x}_${p1.y}_${p2.y}_high`} />
+              ))}
+
+              {connections.dangling ? <use xlinkHref="#dangling_high" /> : null}
+            </g>
+          ) : null}
+        </svg>
       </div>
 
       <ConnectorContext.Provider value={connect}>{children}</ConnectorContext.Provider>
