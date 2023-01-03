@@ -11,6 +11,8 @@ import MainOutput from './MainOutput'
 import Mixer from './Mixer'
 import Oscillator from './Oscillator'
 import PassFilter from './PassFilter'
+import Reverb from './Reverb'
+import WaveShaper from './WaveShaper'
 import useAudioWorkletsLoader from './useAudioWorkletsLoader'
 
 export default function Audio() {
@@ -20,7 +22,7 @@ export default function Audio() {
     })),
   )
   const [lfos] = useState(() =>
-    Array.from({ length: 2 }).map((_, i) => ({
+    Array.from({ length: 1 }).map((_, i) => ({
       id: `lfos[${i}]`,
     })),
   )
@@ -37,16 +39,21 @@ export default function Audio() {
       active: false,
     })),
   )
+  const [reverbs] = useState(() =>
+    Array.from({ length: 1 }).map((_, i) => ({
+      id: `reverbs[${i}]`,
+    })),
+  )
   const [passFilters] = useState(() =>
-    Array.from({ length: 2 }).map((_, i) => ({
+    Array.from({ length: 1 }).map((_, i) => ({
       id: `passFilters[${i}]`,
     })),
   )
-  // const [waveShapers, setWaveShapers] = useState(() =>
-  //   Array.from({ length: 1 }).map((_, i) => ({
-  //     id: `waveShapers[${i}]`,
-  //   })),
-  // )
+  const [waveShapers] = useState(() =>
+    Array.from({ length: 1 }).map((_, i) => ({
+      id: `waveShapers[${i}]`,
+    })),
+  )
 
   const animations = useRef<{ [id: string]: (() => void)[] }>({})
   const animation = useRef<number>(-1)
@@ -88,6 +95,12 @@ export default function Audio() {
       <MIDI>
         {!workletsLoaded ? null : (
           <Preset
+            // defaultConnections={[
+            //   ['keyboard.IO.GOut', 'oscillators[0].IO.GIn'],
+            //   ['oscillators[0].IO.Out', 'mixers[0].IO.In'],
+            //   ['mixers[0].IO.Out', 'mainOutput.IO.In'],
+            // ]}
+            // defaultParams={[]}
             defaultConnections={[
               ['keyboard.IO.GOut', 'envelopes[0].IO.GIn'],
               ['envelopes[0].IO.GOut', 'oscillators[0].IO.GIn'],
@@ -100,7 +113,8 @@ export default function Audio() {
               ['oscillators[3].IO.Out', 'passFilters[0].IO.In'],
               ['lfos[0].IO.Out', 'passFilters[0].Frequency.In'],
               ['passFilters[0].IO.Out', 'mixers[0].IO.In'],
-              ['mixers[0].IO.Out', 'mainOutput.IO.In'],
+              ['mixers[0].IO.Out', 'reverbs[0].IO.In'],
+              ['reverbs[0].IO.Out', 'mainOutput.IO.In'],
             ]}
             defaultParams={[
               ['keyboard.Type', [1]],
@@ -120,6 +134,9 @@ export default function Audio() {
               ['lfos[0].Waveform', [2]],
               ['lfos[0].Frequency', [2000]],
               ['lfos[0].Range', [60]],
+              ['reverbs[0].Delay', [350]],
+              ['reverbs[0].Resonance', [60]],
+              ['reverbs[0].Balance', [100]],
               ['passFilters[0].Frequency', [350]],
               ['passFilters[0].Balance', [100]],
             ]}
@@ -157,8 +174,28 @@ export default function Audio() {
                 />
               ))}
 
+              {reverbs.map(({ id }) => (
+                <Reverb
+                  audioCtx={audioCtx}
+                  deregisterAnimations={() => deregisterAnimations(id)}
+                  id={id}
+                  key={id}
+                  registerAnimation={(animation) => registerAnimation(id, animation)}
+                />
+              ))}
+
               {passFilters.map(({ id }) => (
                 <PassFilter
+                  audioCtx={audioCtx}
+                  deregisterAnimations={() => deregisterAnimations(id)}
+                  id={id}
+                  key={id}
+                  registerAnimation={(animation) => registerAnimation(id, animation)}
+                />
+              ))}
+
+              {waveShapers.map(({ id }) => (
+                <WaveShaper
                   audioCtx={audioCtx}
                   deregisterAnimations={() => deregisterAnimations(id)}
                   id={id}
@@ -176,16 +213,6 @@ export default function Audio() {
                   registerAnimation={(animation) => registerAnimation(id, animation)}
                 />
               ))}
-
-              {/*{this.state.waveShapers.map(({ id }) => (*/}
-              {/*  <WaveShaper*/}
-              {/*    audioCtx={this.audioCtx}*/}
-              {/*    deregisterAnimations={() => this.deregisterAnimations(id)}*/}
-              {/*    id={id}*/}
-              {/*    key={id}*/}
-              {/*    registerAnimation={(animation) => this.registerAnimation(id, animation)}*/}
-              {/*  />*/}
-              {/*))}*/}
 
               <MainOutput
                 audioCtx={audioCtx}

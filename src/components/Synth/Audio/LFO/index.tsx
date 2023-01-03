@@ -29,8 +29,7 @@ export default function LFO({ audioCtx, deregisterAnimations, id, registerAnimat
   const outputNode = useMemo(() => new GainNode(audioCtx, { gain: 1 }), [audioCtx])
 
   useEffect(() => {
-    oscillator.connect(gainNode)
-    gainNode.connect(outputNode)
+    oscillator.connect(gainNode).connect(outputNode)
 
     return () => {
       oscillator.disconnect(gainNode)

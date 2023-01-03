@@ -46,8 +46,7 @@ export default function useSound({
 
   useEffect(() => {
     startSound()
-    mixerNode.connect(gatedNode)
-    gatedNode.connect(outputNode)
+    mixerNode.connect(gatedNode).connect(outputNode)
 
     return () => {
       gatedNode.disconnect(outputNode)

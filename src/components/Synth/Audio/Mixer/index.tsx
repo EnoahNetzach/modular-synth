@@ -21,8 +21,7 @@ export default function Mixer({ audioCtx, deregisterAnimations, id, registerAnim
   const gainNode = useMemo(() => new GainNode(audioCtx, { gain: 0 }), [audioCtx])
 
   useEffect(() => {
-    inputNode.connect(gainNode)
-    gainNode.connect(outputNode)
+    inputNode.connect(gainNode).connect(outputNode)
 
     return () => {
       inputNode.disconnect(gainNode)

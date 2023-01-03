@@ -6,7 +6,19 @@ import Panel from '../../Utils/Panel'
 import Preset from '../../Utils/Preset'
 import Slider from '../../Utils/Slider'
 
-const types: BiquadFilterType[] = ['lowpass', 'highpass', 'bandpass']
+const oversamples: OverSampleType[] = ['none', '2x', '4x']
+
+const deg = Math.PI / 180
+function makeDistortionCurve(amount?: number, samples = 44100) {
+  const k = typeof amount === 'number' ? amount : 50
+  return new Float32Array(
+    Array.from({ length: samples }).map((_, i) => {
+      const x = (i * 2) / samples - 1
+
+      return ((3 + k) * x * 20 * deg) / (Math.PI + k * Math.abs(x))
+    }),
+  )
+}
 
 interface Props {
   audioCtx: AudioContext
@@ -15,15 +27,16 @@ interface Props {
   registerAnimation: (cb: () => void) => void
 }
 
-export default function PassFilter({ audioCtx, deregisterAnimations, id, registerAnimation }: Props) {
+export default function WaveShaper({ audioCtx, deregisterAnimations, id, registerAnimation }: Props) {
   const [balance, setBalance] = useState(50)
-  const [frequency, setFrequency] = useState(1000)
-  const [q, setQ] = useState(20)
-  const [type, setType] = useState(0)
+  const [amount, setAmount] = useState(50)
+  const [oversample, setOversample] = useState(0)
+  const [volume, setVolume] = useState(20)
 
   const inputNode = useMemo(() => new GainNode(audioCtx, { gain: 1 }), [audioCtx])
   const outputNode = useMemo(() => new GainNode(audioCtx, { gain: 1 }), [audioCtx])
-  const filterNode = useMemo(() => new BiquadFilterNode(audioCtx), [audioCtx])
+  const shaperNode = useMemo(() => new WaveShaperNode(audioCtx), [audioCtx])
+  const volumeNode = useMemo(() => new GainNode(audioCtx, { gain: 0 }), [audioCtx])
   const gainNode = useMemo(() => new GainNode(audioCtx, { gain: 0 }), [audioCtx])
   const passThoughNode = useMemo(() => new GainNode(audioCtx, { gain: 1 }), [audioCtx])
   const mixerNode = useMemo(() => new GainNode(audioCtx, { gain: 1 }), [audioCtx])
@@ -31,17 +44,23 @@ export default function PassFilter({ audioCtx, deregisterAnimations, id, registe
   const negBalanceInNode = useMemo(() => new GainNode(audioCtx, { gain: -1 }), [audioCtx])
 
   useEffect(() => {
-    inputNode.connect(passThoughNode).connect(mixerNode)
-    inputNode.connect(filterNode).connect(gainNode).connect(mixerNode)
+    inputNode.connect(shaperNode)
+    inputNode.connect(passThoughNode)
+    shaperNode.connect(volumeNode)
+    volumeNode.connect(gainNode)
+    gainNode.connect(mixerNode)
+    passThoughNode.connect(mixerNode)
     mixerNode.connect(outputNode)
 
-    balanceInNode.connect(negBalanceInNode).connect(passThoughNode.gain)
+    balanceInNode.connect(negBalanceInNode)
     balanceInNode.connect(gainNode.gain)
+    negBalanceInNode.connect(passThoughNode.gain)
 
     return () => {
-      inputNode.disconnect(filterNode)
+      inputNode.disconnect(shaperNode)
       inputNode.disconnect(passThoughNode)
-      filterNode.disconnect(gainNode)
+      shaperNode.disconnect(volumeNode)
+      volumeNode.disconnect(gainNode)
       gainNode.disconnect(mixerNode)
       passThoughNode.disconnect(mixerNode)
       mixerNode.disconnect(outputNode)
@@ -50,7 +69,17 @@ export default function PassFilter({ audioCtx, deregisterAnimations, id, registe
       balanceInNode.disconnect(gainNode.gain)
       negBalanceInNode.disconnect(passThoughNode.gain)
     }
-  }, [balanceInNode, filterNode, gainNode, inputNode, mixerNode, negBalanceInNode, outputNode, passThoughNode])
+  }, [
+    balanceInNode,
+    gainNode,
+    inputNode,
+    mixerNode,
+    negBalanceInNode,
+    outputNode,
+    passThoughNode,
+    shaperNode,
+    volumeNode,
+  ])
 
   useEffect(() => {
     gainNode.gain.setValueAtTime(balance / 100, audioCtx.currentTime)
@@ -58,16 +87,16 @@ export default function PassFilter({ audioCtx, deregisterAnimations, id, registe
   }, [audioCtx, balance, gainNode, passThoughNode])
 
   useEffect(() => {
-    filterNode.frequency.setValueAtTime(frequency, audioCtx.currentTime)
-  }, [audioCtx, filterNode, frequency])
+    shaperNode.curve = makeDistortionCurve(Number.parseFloat(amount.toString()), audioCtx.sampleRate)
+  }, [amount, audioCtx.sampleRate, shaperNode])
 
   useEffect(() => {
-    filterNode.Q.setValueAtTime(q / 100, audioCtx.currentTime)
-  }, [audioCtx, filterNode, q])
+    shaperNode.oversample = oversamples[oversample]
+  }, [oversample, shaperNode])
 
   useEffect(() => {
-    filterNode.type = types[type]
-  }, [filterNode, type])
+    volumeNode.gain.setValueAtTime(volume / 100, audioCtx.currentTime)
+  }, [audioCtx, oversample, shaperNode, volume, volumeNode])
 
   return (
     <Preset id={id}>
@@ -83,30 +112,20 @@ export default function PassFilter({ audioCtx, deregisterAnimations, id, registe
           />
         </div>
 
-        <div className={css.name}>Pass Filter</div>
+        <div className={css.name}>Wave Shaper</div>
 
         <Slider
-          label="Type"
-          max={types.length - 1}
-          onChange={setType}
+          label="Oversample"
+          max={oversamples.length - 1}
+          onChange={setOversample}
           step={1}
-          transformer={(value) => types[value]}
-          value={type}
+          transformer={(value) => oversamples[value]}
+          value={oversample}
         />
 
-        <Slider
-          control={filterNode.frequency}
-          defaultValue={0}
-          label="Frequency"
-          max={10000}
-          min={20}
-          onChange={setFrequency}
-          step={0.1}
-          unit="Hz"
-          value={frequency}
-        />
+        <Slider editable label="Amount" max={500} min={0} onChange={setAmount} value={amount} />
 
-        <Slider label="Q" onChange={setQ} value={q} />
+        <Slider defaultValue={0} label="Volume" onChange={setVolume} unit="%" value={volume} />
 
         <Slider
           control={balanceInNode}
