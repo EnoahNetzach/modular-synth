@@ -9,3 +9,10 @@
 .mute {
   margin-top: 10px;
 }
+
+.controls {
+  align-items: center;
+  display: grid;
+  gap: 80px;
+  grid-template-columns: repeat(2, 1fr);
+}

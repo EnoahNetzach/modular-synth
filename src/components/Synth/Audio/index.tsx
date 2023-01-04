@@ -7,6 +7,7 @@ import Envelope from './Envelope'
 import Keyboard from './Keyboard'
 import { Oscillator as OscillatorDesc } from './Keyboard/types'
 import LFO from './LFO'
+import MIDIControls from './MIDIControls'
 import MainOutput from './MainOutput'
 import Mixer from './Mixer'
 import Oscillator from './Oscillator'
@@ -115,6 +116,8 @@ export default function Audio() {
               ['passFilters[0].IO.Out', 'mixers[0].IO.In'],
               ['mixers[0].IO.Out', 'reverbs[0].IO.In'],
               ['reverbs[0].IO.Out', 'mainOutput.IO.In'],
+              ['midiControls.CC.Volume', 'mainOutput.Volume.GIn'],
+              ['midiControls.CC.Pan', 'mainOutput.Pan.GIn'],
             ]}
             defaultParams={[
               ['keyboard.Type', [1]],
@@ -222,6 +225,8 @@ export default function Audio() {
               />
 
               <Keyboard audioCtx={audioCtx} id="keyboard" oscillators={oscillators} setOscillators={setOscillators} />
+
+              <MIDIControls audioCtx={audioCtx} id="midiControls" />
             </Connector>
           </Preset>
         )}

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import css from './index.module.css'
+import GateNode from '../../../../utils/GateNode'
 import JackPlug from '../../Utils/JackPlug'
 import Oscilloscope from '../../Utils/Oscilloscope'
 import Panel from '../../Utils/Panel'
@@ -23,14 +24,19 @@ export default function MainOutput({
   const deregisterAnimations = useRef(deregisterAnimationsInitial)
 
   const [mute, setMute] = useState(true)
+  const [pan, setPan] = useState(0)
   const [volume, setVolume] = useState(80)
 
   const inputNode = useMemo(() => new GainNode(audioCtx, { gain: 1 }), [audioCtx])
   const outputNode = useMemo(() => new GainNode(audioCtx, { gain: 1 }), [audioCtx])
+  const stereoPannerNode = useMemo(() => new StereoPannerNode(audioCtx), [audioCtx])
   const mainVolumeNode = useMemo(() => new GainNode(audioCtx, { gain: 0 }), [audioCtx])
 
+  const panGateNode = useMemo(() => new GateNode(audioCtx, (value) => setPan(value * 100)), [audioCtx])
+  const volumeGateNode = useMemo(() => new GateNode(audioCtx, (value) => setVolume(value * 100)), [audioCtx])
+
   useEffect(() => {
-    inputNode.connect(mainVolumeNode)
+    inputNode.connect(stereoPannerNode).connect(mainVolumeNode)
     outputNode.connect(audioCtx.destination)
 
     setMute(false)
@@ -40,9 +46,10 @@ export default function MainOutput({
       deregisterAnimations.current()
 
       outputNode.disconnect(audioCtx.destination)
-      inputNode.disconnect(mainVolumeNode)
+      stereoPannerNode.disconnect(mainVolumeNode)
+      inputNode.disconnect(stereoPannerNode)
     }
-  }, [audioCtx, inputNode, mainVolumeNode, outputNode])
+  }, [audioCtx, inputNode, mainVolumeNode, outputNode, stereoPannerNode])
 
   useEffect(() => {
     try {
@@ -57,6 +64,10 @@ export default function MainOutput({
   useEffect(() => {
     mainVolumeNode.gain.setValueAtTime(volume / 100, audioCtx.currentTime)
   }, [audioCtx, mainVolumeNode, volume])
+
+  useEffect(() => {
+    stereoPannerNode.pan.setValueAtTime(pan / 100, audioCtx.currentTime)
+  }, [audioCtx, pan, stereoPannerNode])
 
   return (
     <Preset id={id}>
@@ -85,7 +96,28 @@ export default function MainOutput({
           <button onClick={() => setMute(!mute)}>{!mute ? 'Mute' : 'Unmute'}</button>
         </div>
 
-        <Slider defaultValue={0} label="Volume" onChange={setVolume} unit="%" value={volume} />
+        <div className={css.controls}>
+          <Slider
+            control={panGateNode}
+            defaultValue={0}
+            max={100}
+            min={-100}
+            label="Pan"
+            onChange={setPan}
+            step={1}
+            transformer={(value) => `${Math.abs(value).toFixed(0)}% ${value === 0 ? 'C' : value > 0 ? 'R' : 'L'}`}
+            value={pan}
+          />
+
+          <Slider
+            control={volumeGateNode}
+            defaultValue={0}
+            label="Volume"
+            onChange={setVolume}
+            unit="%"
+            value={volume}
+          />
+        </div>
 
         <Preset id="IO">
           <JackPlug output={inputNode} label="In" />

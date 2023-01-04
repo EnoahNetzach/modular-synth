@@ -1,0 +1,7 @@
+.controls {
+  align-items: center;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(4, auto);
+  width: 100%;
+}

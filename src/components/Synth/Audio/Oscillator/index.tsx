@@ -118,11 +118,11 @@ export default function Oscillator({ audioCtx, deregisterAnimations, frequency, 
           min={-12}
           onChange={setTranspose}
           step={1}
-          unit="semi"
+          unit=" semi"
           value={transpose}
         />
 
-        <Slider label="Detune" onChange={setDetune} unit="cents" value={detune} />
+        <Slider label="Detune" onChange={setDetune} unit=" cents" value={detune} />
 
         <Slider defaultValue={0} label="Volume" onChange={setVolume} unit="%" value={volume} />
 

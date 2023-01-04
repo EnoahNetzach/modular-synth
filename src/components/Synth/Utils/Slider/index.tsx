@@ -1,6 +1,7 @@
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import * as uuid from 'uuid'
 import css from './index.module.css'
+import GateNode from '../../../../utils/GateNode'
 import JackPlug from '../JackPlug'
 import Preset, { PresetContext } from '../Preset'
 
@@ -89,7 +90,7 @@ export default function Slider<T extends string | number>({
       {control ? (
         <Preset id={label}>
           <div className={css.plug}>
-            <JackPlug output={control} label="In" />
+            <JackPlug output={control} label={control instanceof GateNode ? 'GIn' : 'In'} />
           </div>
         </Preset>
       ) : null}
@@ -142,7 +143,8 @@ export default function Slider<T extends string | number>({
             />
           ) : (
             <label className={css.amount} htmlFor={labelId}>
-              {transformer ? transformer(value) : `${Number(value).toFixed(precision)}`} {unit}
+              {transformer ? transformer(value) : `${Number(value).toFixed(precision)}`}
+              {unit}
             </label>
           )}
         </div>

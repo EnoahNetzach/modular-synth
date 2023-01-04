@@ -1,4 +1,6 @@
 .container {
+  --washer-size: 22;
+
   align-items: center;
   color: #1d1a1a;
   display: flex;
@@ -8,9 +10,60 @@
   margin: 5px;
 }
 
-.washer {
-  --washer-size: 22;
+.indicator {
+  --size: var(--washer-size);
+  --value: 0;
 
+  --stopper: 50deg;
+  --color: #da221c;
+  --stopper-color: #222222;
+  --start: calc(180deg + var(--stopper));
+  --length: calc(360deg - var(--stopper) * 2);
+
+  align-items: center;
+  border: 2px solid #aaa;
+  border-radius: 50%;
+  display: flex;
+  height: calc(1px * var(--size));
+  justify-content: center;
+  position: relative;
+  width: calc(1px * var(--size));
+}
+
+.indicator.absolute {
+  --section: calc(var(--value) * var(--length));
+
+  background: conic-gradient(
+    from var(--start),
+    var(--color) 0deg var(--section),
+    transparent var(--section) var(--length),
+    var(--stopper-color) var(--length) 360deg
+  );
+}
+
+.indicator.relative {
+  --thickness: 8deg;
+  --position: calc((var(--value) + 1) / 2 * var(--length));
+  --tick-start: calc(max(0deg, var(--position) - var(--thickness)));
+  --tick-stop: calc(min(var(--length), var(--position) + var(--thickness)));
+
+  --indicator: 3deg;
+
+  background: conic-gradient(
+      from calc(var(--indicator) * -1),
+      var(--stopper-color) 0deg calc(var(--indicator) * 2),
+      transparent calc(var(--indicator) * 2) 360deg
+    ),
+    conic-gradient(
+      from var(--start),
+      transparent 0deg var(--tick-start),
+      var(--color) var(--tick-start) var(--tick-stop),
+      transparent var(--tick-stop) var(--length),
+      var(--stopper-color) var(--length) 360deg
+    );
+}
+
+.washer {
   background: #aaa;
   display: block;
   height: calc(1px * var(--washer-size));
@@ -43,9 +96,8 @@
   content: '';
   display: block;
   height: 10px;
-  left: 0;
+  inset: 0;
   position: absolute;
-  top: 0;
   width: 10px;
 }
 

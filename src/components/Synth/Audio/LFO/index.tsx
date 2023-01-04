@@ -81,7 +81,7 @@ export default function LFO({ audioCtx, deregisterAnimations, id, registerAnimat
           max={2000}
           min={1}
           onChange={(value) => setFrequency(value / 100)}
-          unit="Hz"
+          unit=" Hz"
           transformer={(value) => (value / 100).toFixed(2)}
           value={frequency * 100}
         />
